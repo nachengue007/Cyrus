@@ -26,9 +26,8 @@ dist/
 *.tsbuildinfo
 
 # ==========================
-# Prisma
+# Drizzle
 # ==========================
-app/generated/prisma/
 dev.db
 
 # ==========================
