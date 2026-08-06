@@ -1,6 +1,11 @@
 "use server";
 
-import type { Contact, CreateContactInput, UpdateContactInput } from "./contacts.repository";
+import type { 
+  Contact, 
+  CreateContactInput, 
+  UpdateContactInput 
+} from "./contacts.repository";
+
 import {
   createNewContact,
   deleteExistingContact,

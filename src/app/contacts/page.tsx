@@ -7,17 +7,17 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button, buttonVariants } from "@/components/ui/button";
+} from "@/src/components/ui/table";
+import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card";
+import { Button, buttonVariants } from "@/src/components/ui/button";
 import { Trash2, MoreHorizontal, Mail, Building2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
+} from "@/src/components/ui/dropdown-menu";
+import { cn } from "@/src/lib/utils";
 
 export default async function ContactsPage() {
   const result = await getContactsAction();
