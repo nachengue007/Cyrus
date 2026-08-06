@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createContactAction } from "@/src/server/modules/contacts/contacts.actions";
+import { createTemplateAction } from "@/src/server/modules/templates/templates.actions";
 
 import {
   Dialog,
@@ -16,14 +16,15 @@ import {
 import { Button, buttonVariants } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
+import { Textarea } from "@/src/components/ui/textarea";
 
-export function CreateContact() {
+export function CreateTemplate() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [contact, setContact] = useState({
+  const [template, setTemplate] = useState({
     name: "",
-    company: "",
-    email: "",
+    subject: "",
+    body: "",
   });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -33,12 +34,12 @@ export function CreateContact() {
     setLoading(true);
     setError(null);
 
-    const result = await createContactAction(contact);
+    const result = await createTemplateAction(template);
 
     if (!result.success) {
       setError(result.error);
     } else {
-      setContact({ name: "", company: "", email: "" });
+      setTemplate({ name: "", subject: "", body: "" });
       setOpen(false);
       router.refresh();
     }
@@ -49,15 +50,15 @@ export function CreateContact() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger className={buttonVariants()}>
-        Crear contacto
+        Crear plantilla
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-[425px]">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>Nuevo contacto</DialogTitle>
+            <DialogTitle>Nueva plantilla</DialogTitle>
             <DialogDescription>
-              Completa los datos para registrar un nuevo contacto.
+              Completa los datos para registrar una nueva plantilla.
             </DialogDescription>
           </DialogHeader>
 
@@ -67,32 +68,31 @@ export function CreateContact() {
               <Input
                 id="name"
                 type="text"
-                placeholder="Juan Pérez"
-                value={contact.name}
-                onChange={(e) => setContact({ ...contact, name: e.target.value })}
+                placeholder="Plantilla para ventas"
+                value={template.name}
+                onChange={(e) => setTemplate({ ...template, name: e.target.value })}
                 required
               />
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="company">Compañía</Label>
+              <Label htmlFor="subject">Asunto</Label>
               <Input
-                id="company"
+                id="subject"
                 type="text"
-                placeholder="Acme Inc."
-                value={contact.company}
-                onChange={(e) => setContact({ ...contact, company: e.target.value })}
+                placeholder="Venta de..."
+                value={template.subject}
+                onChange={(e) => setTemplate({ ...template, subject: e.target.value })}
               />
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="juan@ejemplo.com"
-                value={contact.email}
-                onChange={(e) => setContact({ ...contact, email: e.target.value })}
+              <Label htmlFor="body">Cuerpo</Label>
+              <Textarea
+                id="body"
+                placeholder="Hola buenas noches, me llamo..."
+                value={template.body}
+                onChange={(e) => setTemplate({ ...template, body: e.target.value })}
                 required
               />
             </div>

@@ -1,5 +1,4 @@
-import { getContactsAction } from "@/src/server/modules/contacts/contacts.actions";
-import { CreateContact } from "./create-contact-form";
+import { getTemplatesAction } from "@/src/server/modules/templates/templates.actions";
 import {
   Table,
   TableBody,
@@ -18,16 +17,17 @@ import {
   DropdownMenuTrigger,
 } from "@/src/components/ui/dropdown-menu";
 import { cn } from "@/src/lib/utils";
+import { CreateTemplate } from "./create-template-form";
 
-export default async function ContactsPage() {
-  const result = await getContactsAction();
+export default async function TemplatesPage() {
+  const result = await getTemplatesAction();
 
   if (!result.success) {
     return (
       <div className="p-6">
         <Card className="border-destructive/50 bg-destructive/10 text-destructive">
           <CardContent className="pt-6">
-            <p className="font-medium">Error al cargar los contactos: {result.error}</p>
+            <p className="font-medium">Error al cargar las plantillas: {result.error}</p>
           </CardContent>
         </Card>
       </div>
@@ -38,25 +38,24 @@ export default async function ContactsPage() {
     <div className="space-y-6 p-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Contactos</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Plantillas</h1>
           <p className="text-sm text-muted-foreground">
-            Gestiona los contactos de tu plataforma.
+            Gestiona las plantillas para tus emails.
           </p>
         </div>
-        <CreateContact />
+        <CreateTemplate />
       </div>
 
       <Card>
         <CardHeader className="px-6 py-4">
-          <CardTitle className="text-base font-semibold">Lista de contactos</CardTitle>
+          <CardTitle className="text-base font-semibold">Lista de plantillas</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Nombre</TableHead>
-                <TableHead>Compañía</TableHead>
-                <TableHead>Email</TableHead>
+                <TableHead>Asunto</TableHead>
                 <TableHead className="w-[80px] text-right">Acciones</TableHead>
               </TableRow>
             </TableHeader>
@@ -72,20 +71,14 @@ export default async function ContactsPage() {
                   <TableRow key={contact.id}>
                     <TableCell className="font-medium">{contact.name}</TableCell>
                     <TableCell>
-                      {contact.company ? (
+                      {contact.subject ? (
                         <div className="flex items-center gap-1.5 text-muted-foreground">
                           <Building2 className="h-3.5 w-3.5" />
-                          <span>{contact.company}</span>
+                          <span>{contact.subject}</span>
                         </div>
                       ) : (
                         <span className="text-muted-foreground/50">-</span>
                       )}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1.5 text-muted-foreground">
-                        <Mail className="h-3.5 w-3.5" />
-                        <span>{contact.email}</span>
-                      </div>
                     </TableCell>
                     <TableCell className="text-right">
                      <DropdownMenu>
