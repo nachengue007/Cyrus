@@ -29,6 +29,7 @@ dist/
 # Prisma
 # ==========================
 app/generated/prisma/
+dev.db
 
 # ==========================
 # Environment Variables
