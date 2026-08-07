@@ -72,14 +72,6 @@ export function CreateHistory({ contactList, templateList }: { contactList: any,
 
           <div className="grid gap-2">
             <Label htmlFor="contactId">Contacto</Label>
-            {/* <Input
-              id="contactId"
-              type="text"
-              placeholder="123"
-              value={history.contactId}
-              onChange={(e) => setHistory({ ...history, contactId: e.target.value })}
-              required
-            /> */}
             <Select items={contactList} value={history.contactId} onValueChange={(value) => setHistory({ ...history, contactId: value })}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Theme" />
@@ -98,15 +90,6 @@ export function CreateHistory({ contactList, templateList }: { contactList: any,
 
           <div className="grid gap-2">
             <Label htmlFor="templateId">Plantilla</Label>
-            {/* <Input
-              id="templateId"
-              type="text"
-              placeholder="123"
-              value={history.templateId}
-              onChange={(e) => setHistory({ ...history, templateId: e.target.value })}
-              required
-            /> */}
-
             <Select items={templateList} value={history.templateId} onValueChange={(value) => setHistory({ ...history, templateId: value })}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Theme" />
