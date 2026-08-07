@@ -1,25 +1,25 @@
 "use server"
 
 import type { 
-  Template, 
-  CreateTemplateInput, 
-  UpdateTemplateInput 
-} from "./templates.repository";
+  History, 
+  CreateHistoryInput, 
+  UpdateHistoryInput 
+} from "./histories.repository";
 
 import {
-  createNewTemplate,
-  deleteExistingTemplate,
-  getAllTemplates,
-  updateExistingTemplate,
-} from "./templates.service";
+  createNewHistory,
+  deleteExistingHistory,
+  getAllHistories,
+  updateExistingHistory,
+} from "./histories.service";
 
 type ActionResult<T> = 
   | { success: true; data: T }
   | { success: false; error: string };
 
-export async function getTemplatesAction(): Promise<ActionResult<Template[]>> {
+export async function getHistoriesAction(): Promise<ActionResult<History[]>> {
   try {
-    const data = await getAllTemplates();
+    const data = await getAllHistories();
     return { success: true, data };
   }
   catch (error) {
@@ -28,11 +28,11 @@ export async function getTemplatesAction(): Promise<ActionResult<Template[]>> {
   }
 }
 
-export async function createTemplateAction(
-  input: CreateTemplateInput
-): Promise<ActionResult<Template>> {
-  try {
-    const data = await createNewTemplate(input);
+export async function createHistoryAction(
+  input: CreateHistoryInput
+): Promise<ActionResult<History>> {
+  try{
+    const data = await createNewHistory(input);
     return { success: true, data };
   }
   catch (error) {
@@ -41,12 +41,12 @@ export async function createTemplateAction(
   }
 }
 
-export async function updateTemplateAction(
+export async function updateHistoryAction(
   id: string,
-  input: UpdateTemplateInput
-): Promise<ActionResult<Template>> {
+  input: UpdateHistoryInput
+): Promise<ActionResult<History>> {
   try {
-    const data = await updateExistingTemplate(id, input);
+    const data = await updateExistingHistory(id, input);
     return { success: true, data };
   }
   catch (error) {
@@ -55,11 +55,11 @@ export async function updateTemplateAction(
   }
 }
 
-export async function deleteTemplateAction(
-  id: string,
-): Promise<ActionResult<Template>> {
+export async function deleteHistoryAction(
+  id: string
+): Promise<ActionResult<History>> {
   try {
-    const data = await deleteExistingTemplate(id);
+    const data = await deleteExistingHistory(id);
     return { success: true, data };
   }
   catch (error) {

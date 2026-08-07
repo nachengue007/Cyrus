@@ -3,8 +3,8 @@ import { templates } from "@/src/server/db/schema";
 import { eq } from "drizzle-orm";
 
 export type Template = typeof templates.$inferSelect;
-export type CreateTemplateInput = Omit<typeof templates.$inferInsert, "id" | "createdAt">
-export type UpdateTemplateInput = Partial<CreateTemplateInput>
+export type CreateTemplateInput = Omit<typeof templates.$inferInsert, "id" | "createdAt">;
+export type UpdateTemplateInput = Partial<CreateTemplateInput>;
 
 export async function findAllTemplates(): Promise<Template[]> {
   return db.select().from(templates).orderBy(templates.createdAt);
