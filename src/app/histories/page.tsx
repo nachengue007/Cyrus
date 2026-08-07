@@ -1,4 +1,4 @@
-import { getHistoriesAction } from "@/src/server/modules/histories/histories.actions";
+import { getHistoriesAction, getContactsAndTemplatesAction } from "@/src/server/modules/histories/histories.actions";
 import {
   Table,
   TableBody,
@@ -21,6 +21,7 @@ import { CreateHistory } from "./create-history-form";
 
 export default async function TemplatesPage() {
   const result = await getHistoriesAction();
+  const data = await getContactsAndTemplatesAction();
 
   if (!result.success) {
     return (
@@ -34,7 +35,19 @@ export default async function TemplatesPage() {
     );
   }
 
-  console.log(result)
+  if (!data.success) {
+    return (
+      <div className="p-6">
+        <Card className="border-destructive/50 bg-destructive/10 text-destructive">
+          <CardContent className="pt-6">
+            <p className="font-medium">Error al cargar contactos y plantillas: {data.error}</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  const { contactList, templateList } = data.data;
 
   return (
     <div className="space-y-6 p-6">
@@ -45,7 +58,7 @@ export default async function TemplatesPage() {
             Gestiona el historial de correos enviados.
           </p>
         </div>
-        <CreateHistory />
+        <CreateHistory contactList={contactList} templateList={templateList} />
       </div>
 
       <Card>

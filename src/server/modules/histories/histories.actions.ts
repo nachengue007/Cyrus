@@ -4,7 +4,9 @@ import type {
   History, 
   CreateHistoryInput, 
   UpdateHistoryInput,
-  HistorySelect
+  HistorySelect,
+  Contacts,
+  Templates,
 } from "./histories.repository";
 
 import {
@@ -12,6 +14,7 @@ import {
   deleteExistingHistory,
   getAllHistories,
   updateExistingHistory,
+  listAllContactsAndTemplates,
 } from "./histories.service";
 
 type ActionResult<T> = 
@@ -34,6 +37,17 @@ export async function createHistoryAction(
 ): Promise<ActionResult<History>> {
   try{
     const data = await createNewHistory(input);
+    return { success: true, data };
+  }
+  catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return { success: false, error: message };
+  }
+}
+
+export async function getContactsAndTemplatesAction(): Promise<ActionResult<{ contactList: Contacts[]; templateList: Templates[] }>> {
+  try {
+    const data = await listAllContactsAndTemplates();
     return { success: true, data };
   }
   catch (error) {

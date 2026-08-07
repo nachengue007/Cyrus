@@ -14,6 +14,14 @@ export type HistorySelect = {
   status: string;
   sentAt: string | null;
 };
+export type Contacts = {
+  id: string;
+  name: string | null;
+}
+export type Templates = {
+  id: string;
+  name: string | null;
+}
 
 export async function findAllHistories(): Promise<HistorySelect[]> {
   const result = await db
@@ -42,6 +50,24 @@ export async function findHistoryById(id: string): Promise<History | undefined> 
 export async function createHistory(data: CreateHistoryInput): Promise<History> {
   const result = await db.insert(histories).values(data).returning();
   return result[0];
+}
+
+export async function listContactsAndTemplates(): Promise<{ contactList: Contacts[]; templateList: Templates[] }> {
+  const contactList = await db
+    .select({
+      id: contacts.id,
+      name: contacts.name
+    })
+    .from(contacts);
+  
+  const templateList = await db
+    .select({
+      id: templates.id,
+      name: templates.name
+    })
+    .from(templates);
+  
+  return { contactList, templateList }
 }
 
 export async function updateHistory(

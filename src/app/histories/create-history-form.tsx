@@ -13,11 +13,19 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/src/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/src/components/ui/select";
 import { Button, buttonVariants } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
 
-export function CreateHistory() {
+export function CreateHistory({ contactList, templateList }: { contactList: any, templateList: any }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [history, setHistory] = useState({
@@ -64,26 +72,55 @@ export function CreateHistory() {
 
           <div className="grid gap-2">
             <Label htmlFor="contactId">Contacto</Label>
-            <Input
+            {/* <Input
               id="contactId"
               type="text"
               placeholder="123"
               value={history.contactId}
               onChange={(e) => setHistory({ ...history, contactId: e.target.value })}
               required
-            />
+            /> */}
+            <Select items={contactList} value={history.contactId} onValueChange={(value) => setHistory({ ...history, contactId: value })}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Theme" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  {contactList.map((item: any) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.name}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="grid gap-2">
             <Label htmlFor="templateId">Plantilla</Label>
-            <Input
+            {/* <Input
               id="templateId"
               type="text"
               placeholder="123"
               value={history.templateId}
               onChange={(e) => setHistory({ ...history, templateId: e.target.value })}
               required
-            />
+            /> */}
+
+            <Select items={templateList} value={history.templateId} onValueChange={(value) => setHistory({ ...history, templateId: value })}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Theme" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  {templateList.map((item: any) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.name}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="grid gap-4 py-4">

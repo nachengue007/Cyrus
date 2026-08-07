@@ -4,10 +4,13 @@ import {
   findHistoryById,
   updateHistory,
   deleteHistory,
+  listContactsAndTemplates,
   type History,
   type CreateHistoryInput,
   type UpdateHistoryInput,
   type HistorySelect,
+  type Contacts,
+  type Templates,
 } from "./histories.repository";
 
 export async function getAllHistories(): Promise<HistorySelect[]> {
@@ -22,6 +25,10 @@ export async function createNewHistory(
   }
 
   return createHistory(data);
+}
+
+export async function listAllContactsAndTemplates(): Promise<{ contactList: Contacts[]; templateList: Templates[] }> {
+  return listContactsAndTemplates();
 }
 
 export async function updateExistingHistory(
