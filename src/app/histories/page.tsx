@@ -1,4 +1,4 @@
-import { getTemplatesAction } from "@/src/server/modules/templates/templates.actions";
+import { getHistoriesAction } from "@/src/server/modules/histories/histories.actions";
 import {
   Table,
   TableBody,
@@ -9,7 +9,7 @@ import {
 } from "@/src/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card";
 import { buttonVariants } from "@/src/components/ui/button";
-import { Trash2, MoreHorizontal, Mail, Building2 } from "lucide-react";
+import { Trash2, MoreHorizontal, Building2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,45 +17,48 @@ import {
   DropdownMenuTrigger,
 } from "@/src/components/ui/dropdown-menu";
 import { cn } from "@/src/lib/utils";
-import { CreateTemplate } from "./create-template-form";
+import { CreateHistory } from "./create-history-form";
 
 export default async function TemplatesPage() {
-  const result = await getTemplatesAction();
+  const result = await getHistoriesAction();
 
   if (!result.success) {
     return (
       <div className="p-6">
         <Card className="border-destructive/50 bg-destructive/10 text-destructive">
           <CardContent className="pt-6">
-            <p className="font-medium">Error al cargar las plantillas: {result.error}</p>
+            <p className="font-medium">Error al cargar el historial: {result.error}</p>
           </CardContent>
         </Card>
       </div>
     );
   }
 
+  console.log(result)
+
   return (
     <div className="space-y-6 p-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Plantillas</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Historial de correos enviados</h1>
           <p className="text-sm text-muted-foreground">
-            Gestiona las plantillas para tus emails.
+            Gestiona el historial de correos enviados.
           </p>
         </div>
-        <CreateTemplate />
+        <CreateHistory />
       </div>
 
       <Card>
         <CardHeader className="px-6 py-4">
-          <CardTitle className="text-base font-semibold">Lista de plantillas</CardTitle>
+          <CardTitle className="text-base font-semibold">Historial</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Nombre</TableHead>
-                <TableHead>Asunto</TableHead>
+                <TableHead>contactId</TableHead>
+                <TableHead>status</TableHead>
+                <TableHead>sentAt</TableHead>
                 <TableHead className="w-[80px] text-right">Acciones</TableHead>
               </TableRow>
             </TableHeader>
@@ -67,14 +70,24 @@ export default async function TemplatesPage() {
                   </TableCell>
                 </TableRow>
               ) : (
-                result.data.map((template) => (
-                  <TableRow key={template.id}>
-                    <TableCell className="font-medium">{template.name}</TableCell>
+                result.data.map((history) => (
+                  <TableRow key={history.id}>
+                    <TableCell className="font-medium">{history.contactId}</TableCell>
                     <TableCell>
-                      {template.subject ? (
+                      {history.status ? (
                         <div className="flex items-center gap-1.5 text-muted-foreground">
                           <Building2 className="h-3.5 w-3.5" />
-                          <span>{template.subject}</span>
+                          <span>{history.status}</span>
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground/50">-</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {history.sentAt ? (
+                        <div className="flex items-center gap-1.5 text-muted-foreground">
+                          <Building2 className="h-3.5 w-3.5" />
+                          <span>{history.sentAt}</span>
                         </div>
                       ) : (
                         <span className="text-muted-foreground/50">-</span>
