@@ -72,14 +72,14 @@ export function CreateHistory({ contactList, templateList }: { contactList: any,
 
           <div className="grid gap-2">
             <Label htmlFor="contactId">Contacto</Label>
-            <Select items={contactList} value={history.contactId} onValueChange={(value) => setHistory({ ...history, contactId: value })}>
+            <Select items={contactList} value={history.contactId} onValueChange={(value) => setHistory({ ...history, contactId: value ?? "" })}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Theme" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
                   {contactList.map((item: any) => (
-                    <SelectItem key={item.id} value={item.id}>
+                    <SelectItem key={item.id} value={item.id ?? ""}>
                       {item.name}
                     </SelectItem>
                   ))}
@@ -90,14 +90,14 @@ export function CreateHistory({ contactList, templateList }: { contactList: any,
 
           <div className="grid gap-2">
             <Label htmlFor="templateId">Plantilla</Label>
-            <Select items={templateList} value={history.templateId} onValueChange={(value) => setHistory({ ...history, templateId: value })}>
+            <Select items={templateList} value={history.templateId} onValueChange={(value) => setHistory({ ...history, templateId: value ?? "" })}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Theme" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
                   {templateList.map((item: any) => (
-                    <SelectItem key={item.id} value={item.id}>
+                    <SelectItem key={item.id} value={item.id ?? ""}>
                       {item.name}
                     </SelectItem>
                   ))}
