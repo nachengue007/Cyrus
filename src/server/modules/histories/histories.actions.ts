@@ -3,7 +3,8 @@
 import type { 
   History, 
   CreateHistoryInput, 
-  UpdateHistoryInput 
+  UpdateHistoryInput,
+  HistorySelect
 } from "./histories.repository";
 
 import {
@@ -17,7 +18,7 @@ type ActionResult<T> =
   | { success: true; data: T }
   | { success: false; error: string };
 
-export async function getHistoriesAction(): Promise<ActionResult<History[]>> {
+export async function getHistoriesAction(): Promise<ActionResult<HistorySelect[]>> {
   try {
     const data = await getAllHistories();
     return { success: true, data };

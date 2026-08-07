@@ -1,13 +1,37 @@
 import { db } from "@/src/server/db";
-import { histories } from "@/src/server/db/schema";
+import { contacts, histories, templates } from "@/src/server/db/schema";
 import { eq } from "drizzle-orm";
 
 export type History = typeof histories.$inferSelect;
 export type CreateHistoryInput = Omit<typeof histories.$inferInsert, "id" | "sentAt">
 export type UpdateHistoryInput = Partial<CreateHistoryInput>;
+export type HistorySelect = {
+  id: string;
+  contactId: string;
+  contactName: string | null;
+  templateId: string;
+  templateName: string | null;
+  status: string;
+  sentAt: string | null;
+};
 
-export async function findAllHistories(): Promise<History[]> {
-  return db.select().from(histories).orderBy(histories.sentAt);
+export async function findAllHistories(): Promise<HistorySelect[]> {
+  const result = await db
+    .select({
+      id: histories.id,
+      contactId: histories.contactId,
+      contactName: contacts.name,
+      templateId: histories.templateId,
+      templateName: templates.name,
+      status: histories.status,
+      sentAt: histories.sentAt
+    })
+    .from(histories)
+    .innerJoin(contacts, eq(contacts.id, histories.contactId))
+    .innerJoin(templates, eq(templates.id, histories.templateId))
+    .orderBy(histories.sentAt);
+    
+  return result;
 }
 
 export async function findHistoryById(id: string): Promise<History | undefined> {

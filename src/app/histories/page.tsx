@@ -34,6 +34,8 @@ export default async function TemplatesPage() {
     );
   }
 
+  console.log(result)
+
   return (
     <div className="space-y-6 p-6">
       <div className="flex items-center justify-between">
@@ -54,9 +56,10 @@ export default async function TemplatesPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>contactId</TableHead>
-                <TableHead>status</TableHead>
-                <TableHead>sentAt</TableHead>
+                <TableHead>Nombre de contacto</TableHead>
+                <TableHead>Nombre de plantilla</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Fecha de envio</TableHead>
                 <TableHead className="w-[80px] text-right">Acciones</TableHead>
               </TableRow>
             </TableHeader>
@@ -70,7 +73,8 @@ export default async function TemplatesPage() {
               ) : (
                 result.data.map((history) => (
                   <TableRow key={history.id}>
-                    <TableCell className="font-medium">{history.contactId}</TableCell>
+                    <TableCell className="font-medium">{history.contactName}</TableCell>
+                    <TableCell className="font-medium">{history.templateName}</TableCell>
                     <TableCell>
                       {history.status ? (
                         <div className="flex items-center gap-1.5 text-muted-foreground">

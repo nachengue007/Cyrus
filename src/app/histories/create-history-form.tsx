@@ -24,6 +24,7 @@ export function CreateHistory() {
     status: "",
     sentAt: "",
     contactId: "",
+    templateId: "",
   });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -38,7 +39,7 @@ export function CreateHistory() {
     if (!result.success) {
       setError(result.error);
     } else {
-      setHistory({ status: "", sentAt: "", contactId: "" });
+      setHistory({ status: "", sentAt: "", contactId: "", templateId: "" });
       setOpen(false);
       router.refresh();
     }

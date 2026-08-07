@@ -7,9 +7,10 @@ import {
   type History,
   type CreateHistoryInput,
   type UpdateHistoryInput,
+  type HistorySelect,
 } from "./histories.repository";
 
-export async function getAllHistories(): Promise<History[]> {
+export async function getAllHistories(): Promise<HistorySelect[]> {
   return findAllHistories();
 }
 

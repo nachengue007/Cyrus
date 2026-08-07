@@ -1,0 +1,1 @@
+ALTER TABLE `histories` ADD `template_id` text NOT NULL REFERENCES templates(id);

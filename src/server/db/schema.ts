@@ -21,6 +21,7 @@ export const templates = sqliteTable("templates", {
 export const histories = sqliteTable("histories", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
   contactId: text("contact_id").notNull().references(() => contacts.id),
+  templateId: text("template_id").notNull().references(() => templates.id),
   status: text("status").notNull(),
   sentAt: text("sent_at").default(sql`(CURRENT_TIMESTAMP)`),
 });
@@ -33,5 +34,9 @@ export const historiesRelations = relations(histories, ({ one }) => ({
   contact: one(contacts, {
     fields: [histories.contactId],
     references: [contacts.id],
+  }),
+  templates: one(templates, {
+    fields: [histories.templateId],
+    references: [templates.id],
   }),
 }));
