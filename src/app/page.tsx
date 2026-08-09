@@ -8,6 +8,7 @@ export default function Home() {
           <Link href="contacts">Contacts</Link>
           <Link href="templates">Templates</Link>
           <Link href="histories">History</Link>
+          <Link href="send-em">Send Email</Link>
         </div>
       </main>
     </div>
