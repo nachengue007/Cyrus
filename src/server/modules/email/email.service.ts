@@ -3,9 +3,16 @@ import { db } from "@/src/server/db";
 import { contacts, templates } from "@/src/server/db/schema";
 import { eq } from "drizzle-orm";
 
+export interface EmailAttachment {
+  filename: string;
+  content: Buffer;
+  contentType: string;
+}
+
 export interface SendEmailInput {
   contactId: string;
   templateId: string;
+  attachments?: EmailAttachment[];
 }
 
 export interface SendEmailResult {
@@ -69,10 +76,15 @@ export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult>
   const transporter = createTransporter();
 
   const info = await transporter.sendMail({
-    from: `"${process.env.SMTP_FROM_NAME ?? "Cyrus"}" <${process.env.SMTP_USER}>`,
+    from: `"Cyrus" <${process.env.SMTP_USER}>`,
     to: contact.email,
     subject,
     html: body,
+    attachments: (input.attachments ?? []).map((a) => ({
+      filename: a.filename,
+      content: a.content,
+      contentType: a.contentType,
+    })),
   });
 
   return {

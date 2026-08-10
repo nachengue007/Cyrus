@@ -26,7 +26,7 @@ export default async function SendEmPage() {
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Enviar correo</h1>
         <p className="text-sm text-muted-foreground">
-          Selecciona uno o mas contactos y una plantilla. Los emails se envian de forma secuencial con 30 segundos de espera entre cada uno.
+          Selecciona uno o más contactos y una plantilla. Los emails se envían de forma secuencial con 5 segundos de espera entre cada uno.
         </p>
       </div>
 

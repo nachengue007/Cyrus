@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { BatchEvent } from "@/src/app/api/send-batch/route";
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card";
 import { Button } from "@/src/components/ui/button";
@@ -13,7 +13,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/src/components/ui/select";
-import { CheckCircle2, XCircle, Send, Loader2, Clock, X } from "lucide-react";
+import {
+  CheckCircle2,
+  XCircle,
+  Send,
+  Loader2,
+  Clock,
+  X,
+  Paperclip,
+  FileText,
+} from "lucide-react";
 import { cn } from "@/src/lib/utils";
 
 type Contact = { id: string; name: string | null };
@@ -37,12 +46,26 @@ interface QueueItem {
   status: ItemStatus;
 }
 
+const MAX_FILE_SIZE_MB = 10;
+const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+const MAX_ATTACHMENTS = 5;
+const ALLOWED_EXTENSIONS = ".jpg,.jpeg,.png,.webp,.gif,.pdf,.doc,.docx,.xls,.xlsx,.txt,.csv";
+
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 export function SendEmailForm({ contactList, templateList }: Props) {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [templateId, setTemplateId] = useState("");
+  const [attachments, setAttachments] = useState<File[]>([]);
+  const [fileError, setFileError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [queue, setQueue] = useState<QueueItem[]>([]);
   const [summary, setSummary] = useState<{ sent: number; failed: number } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   function toggleContact(id: string | null) {
     if (!id) return;
@@ -53,6 +76,35 @@ export function SendEmailForm({ contactList, templateList }: Props) {
 
   function removeContact(id: string) {
     setSelectedIds((prev) => prev.filter((x) => x !== id));
+  }
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setFileError(null);
+    const files = Array.from(e.target.files ?? []);
+
+    const combined = [...attachments, ...files];
+
+    if (combined.length > MAX_ATTACHMENTS) {
+      setFileError(`Máximo ${MAX_ATTACHMENTS} archivos por envío`);
+      e.target.value = "";
+      return;
+    }
+
+    for (const file of files) {
+      if (file.size > MAX_FILE_SIZE_BYTES) {
+        setFileError(`"${file.name}" supera el límite de ${MAX_FILE_SIZE_MB}MB`);
+        e.target.value = "";
+        return;
+      }
+    }
+
+    setAttachments(combined);
+    e.target.value = "";
+  }
+
+  function removeAttachment(index: number) {
+    setAttachments((prev) => prev.filter((_, i) => i !== index));
+    setFileError(null);
   }
 
   function updateQueueItem(contactId: string, status: ItemStatus) {
@@ -76,11 +128,32 @@ export function SendEmailForm({ contactList, templateList }: Props) {
     setSummary(null);
     setLoading(true);
 
+    // Build FormData — this is how we send binary files to the route handler
+    const formData = new FormData();
+    formData.set("contactIds", JSON.stringify(selectedIds));
+    formData.set("templateId", templateId);
+    formData.set("contactNames", JSON.stringify(contactNames));
+    for (const file of attachments) {
+      formData.append("attachments", file);
+    }
+
     const res = await fetch("/api/send-batch", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ contactIds: selectedIds, templateId, contactNames }),
+      body: formData,
     });
+
+    if (!res.ok) {
+      const json = await res.json().catch(() => ({ error: "Error desconocido" }));
+      setSummary(null);
+      setLoading(false);
+      setQueue((prev) =>
+        prev.map((item) => ({
+          ...item,
+          status: { state: "error", message: json.error ?? "Error de validación" },
+        }))
+      );
+      return;
+    }
 
     if (!res.body) {
       setLoading(false);
@@ -127,7 +200,6 @@ export function SendEmailForm({ contactList, templateList }: Props) {
               break;
 
             case "waiting":
-              // Mark the next pending item as waiting
               setQueue((prev) => {
                 const nextIndex = prev.findIndex((i) => i.status.state === "pending");
                 if (nextIndex === -1) return prev;
@@ -144,10 +216,11 @@ export function SendEmailForm({ contactList, templateList }: Props) {
               setLoading(false);
               setSelectedIds([]);
               setTemplateId("");
+              setAttachments([]);
               break;
           }
-        } catch (e: any) {
-          console.error(e);
+        } catch {
+          // malformed SSE line, skip
         }
       }
     }
@@ -219,9 +292,7 @@ export function SendEmailForm({ contactList, templateList }: Props) {
                       <SelectItem
                         key={c.id}
                         value={c.id}
-                        className={cn(
-                          selectedIds.includes(c.id) && "font-semibold text-primary"
-                        )}
+                        className={cn(selectedIds.includes(c.id) && "font-semibold text-primary")}
                       >
                         {selectedIds.includes(c.id) ? "✓ " : ""}{c.name ?? c.id}
                       </SelectItem>
@@ -231,7 +302,6 @@ export function SendEmailForm({ contactList, templateList }: Props) {
               </Select>
             )}
 
-            {/* Selected contacts chips */}
             {selectedContacts.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mt-1">
                 {selectedContacts.map((c) => (
@@ -250,6 +320,71 @@ export function SendEmailForm({ contactList, templateList }: Props) {
                       </button>
                     )}
                   </span>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Attachments */}
+          <div className="grid gap-2">
+            <Label>Adjuntos</Label>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              accept={ALLOWED_EXTENSIONS}
+              onChange={handleFileChange}
+              disabled={loading || attachments.length >= MAX_ATTACHMENTS}
+              className="hidden"
+            />
+
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={loading || attachments.length >= MAX_ATTACHMENTS}
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full justify-start gap-2 text-muted-foreground"
+            >
+              <Paperclip className="h-4 w-4" />
+              {attachments.length === 0
+                ? "Adjuntar archivos..."
+                : attachments.length >= MAX_ATTACHMENTS
+                ? `Límite alcanzado (${MAX_ATTACHMENTS} archivos)`
+                : "Agregar más archivos..."}
+            </Button>
+
+            {fileError && (
+              <p className="text-xs text-destructive">{fileError}</p>
+            )}
+
+            <p className="text-xs text-muted-foreground">
+              Máx. {MAX_ATTACHMENTS} archivos · {MAX_FILE_SIZE_MB}MB por archivo · PDF, imágenes, Word, Excel, CSV, TXT
+            </p>
+
+            {attachments.length > 0 && (
+              <div className="space-y-1">
+                {attachments.map((file, i) => (
+                  <div
+                    key={`${file.name}-${i}`}
+                    className="flex items-center gap-2 rounded-md border bg-muted/30 px-3 py-1.5 text-sm"
+                  >
+                    <FileText className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                    <span className="flex-1 truncate text-xs">{file.name}</span>
+                    <span className="text-xs text-muted-foreground shrink-0">
+                      {formatBytes(file.size)}
+                    </span>
+                    {!loading && (
+                      <button
+                        type="button"
+                        onClick={() => removeAttachment(i)}
+                        className="hover:text-destructive transition-colors"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    )}
+                  </div>
                 ))}
               </div>
             )}
@@ -341,6 +476,7 @@ export function SendEmailForm({ contactList, templateList }: Props) {
               <>
                 <Send className="mr-2 h-4 w-4" />
                 Enviar{selectedIds.length > 1 ? ` a ${selectedIds.length} contactos` : " email"}
+                {attachments.length > 0 && ` · ${attachments.length} adjunto${attachments.length > 1 ? "s" : ""}`}
               </>
             )}
           </Button>
