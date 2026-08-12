@@ -40,6 +40,13 @@ function createTransporter() {
   });
 }
 
+function textToHtml(text: string): string {
+  return text
+    .split("\n")
+    .map((line) => `<p style="margin:0 0 4px 0">${line.trim() === "" ? "&nbsp;" : line}</p>`)
+    .join("\n");
+}
+
 export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult> {
   // Fetch contact
   const contactResult = await db
@@ -73,13 +80,17 @@ export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult>
   const subject = replacePlaceholders(template.subject, contact);
   const body = replacePlaceholders(template.body, contact);
 
+  // If the body already contains HTML tags, send as-is; otherwise convert newlines to <p> tags
+  const isHtml = /<[a-z][\s\S]*>/i.test(body);
+  const htmlBody = isHtml ? body : textToHtml(body);
+
   const transporter = createTransporter();
 
   const info = await transporter.sendMail({
     from: `"Cyrus" <${process.env.SMTP_USER}>`,
     to: contact.email,
     subject,
-    html: body,
+    html: htmlBody,
     attachments: (input.attachments ?? []).map((a) => ({
       filename: a.filename,
       content: a.content,
